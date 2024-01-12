@@ -2,7 +2,7 @@ use glsl::{
     parser::Parse,
     syntax::{
         self, ArraySpecifier, ArraySpecifierDimension, ArrayedIdentifier, StructFieldSpecifier,
-        StructSpecifier,
+        StructSpecifier, TypeSpecifierNonArray,
     },
     visitor::{Host, Visit, Visitor},
 };
@@ -67,50 +67,58 @@ fn assert_rust_struct_validity(item: &ItemStruct) {
     }
 }
 
-fn map_glsl_type(ty: glsl::syntax::TypeSpecifierNonArray) -> proc_macro2::Ident {
-    // Oh god
-    match ty {
-        syntax::TypeSpecifierNonArray::Void => todo!(),
-        syntax::TypeSpecifierNonArray::Bool => todo!(),
-        syntax::TypeSpecifierNonArray::Int => todo!(),
-        syntax::TypeSpecifierNonArray::UInt => todo!(),
-        syntax::TypeSpecifierNonArray::Float => todo!(),
-        syntax::TypeSpecifierNonArray::Double => todo!(),
-        syntax::TypeSpecifierNonArray::Vec2 => todo!(),
-        syntax::TypeSpecifierNonArray::Vec3 => todo!(),
-        syntax::TypeSpecifierNonArray::Vec4 => todo!(),
-        syntax::TypeSpecifierNonArray::DVec2 => todo!(),
-        syntax::TypeSpecifierNonArray::DVec3 => todo!(),
-        syntax::TypeSpecifierNonArray::DVec4 => todo!(),
-        syntax::TypeSpecifierNonArray::BVec2 => todo!(),
-        syntax::TypeSpecifierNonArray::BVec3 => todo!(),
-        syntax::TypeSpecifierNonArray::BVec4 => todo!(),
-        syntax::TypeSpecifierNonArray::IVec2 => todo!(),
-        syntax::TypeSpecifierNonArray::IVec3 => todo!(),
-        syntax::TypeSpecifierNonArray::IVec4 => todo!(),
-        syntax::TypeSpecifierNonArray::UVec2 => todo!(),
-        syntax::TypeSpecifierNonArray::UVec3 => todo!(),
-        syntax::TypeSpecifierNonArray::UVec4 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat2 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat3 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat4 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat23 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat24 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat32 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat34 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat42 => todo!(),
-        syntax::TypeSpecifierNonArray::Mat43 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat2 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat3 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat4 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat23 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat24 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat32 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat34 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat42 => todo!(),
-        syntax::TypeSpecifierNonArray::DMat43 => todo!(),
-        _ => todo!(),
-    }
+// FIXME: return a syn Path instead of an Ident
+macro_rules! type_map {
+    (@primitive $glsl:ident => $primitive:ty) => {
+        TypeSpecifierNonArray::$glsl => $primitive
+    };
+
+    ($($glsl:ident => $lit:path),* $(,)?) => {
+        /// Get the glam type corresponding to a given glsl type.
+        fn map_glsl_type(ty: TypeSpecifierNonArray) -> proc_macro2::Ident {
+            let span = Span::call_site();
+            match ty {
+                TypeSpecifierNonArray::Int => format_ident!(stringify!(i32), span = span),
+                TypeSpecifierNonArray::UInt => format_ident!(stringify!(u32), span = span),
+                TypeSpecifierNonArray::Float => format_ident!(stringify!(f32), span = span),
+                TypeSpecifierNonArray::Double => format_ident!(stringify!(f64), span = span),
+                $(TypeSpecifierNonArray::$glsl => format_ident!(stringify!(glam::$lit), span = span),)*
+                ty => abort!(Span::call_site(), "Incompatible GLSL type: {:?}", ty),
+            }
+        }
+    };
+}
+
+// Could probably figure out a more succint way to do this using grouping based on glam type
+// module but this works well enough.
+type_map! {
+    Vec2 => f32::Vec2,
+    Vec3 => f32::Vec3,
+    Vec4 => f32::Vec4,
+
+    Mat2 => f32::Mat2,
+    Mat3 => f32::Mat3,
+    Mat4 => f32::Mat4,
+
+    DVec2 => f64::DVec2,
+    DVec3 => f64::DVec3,
+    DVec4 => f64::DVec4,
+
+    DMat2 => f64::DMat2,
+    DMat3 => f64::DMat3,
+    DMat4 => f64::DMat4,
+
+    BVec2 => bool::BVec2,
+    BVec3 => bool::BVec3,
+    BVec4 => bool::BVec4,
+
+    IVec2 => i32::IVec2,
+    IVec3 => i32::IVec3,
+    IVec4 => i32::IVec4,
+
+    UVec2 => u32::UVec2,
+    UVec3 => u32::UVec3,
+    UVec4 => u32::UVec4,
 }
 
 /// Import a struct from a GLSL file.
@@ -192,6 +200,7 @@ fn convert_glsl_struct_fields(fields: Vec<StructFieldSpecifier>) -> Vec<proc_mac
                 Span::call_site(),
             );
             // let ty = syn::Type::new(field.ty.ty, Span::call_site());
+            // FIXME: Move Path creation to function
             let ty = syn::Type::Path(syn::TypePath {
                 qself: None,
                 path: syn::Path {

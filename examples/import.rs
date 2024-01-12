@@ -1,4 +1,7 @@
-#[glrs::import(path = "examples/structs.glsl", name = "Camera")]
+#[glrs::import(path = "examples/structs.glsl")]
+#[derive(Debug, Default)]
 struct Camera;
 
-fn main() {}
+fn main() {
+    dbg!(Camera::default());
+}

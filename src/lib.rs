@@ -1,6 +1,3 @@
-// TODO: Remove once implementation done
-#![allow(unreachable_code)]
-
 mod convert;
 
 use proc_macro::TokenStream;

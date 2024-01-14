@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Raphaël Duhen <raphael.duhen@gmail.com>"]
 categories = ["graphics", "development-tools"]
+include = ["**/*.rs", "**/*.glsl"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -14,6 +15,7 @@ proc-macro-error = "1.0.4"
 proc-macro2 = "1.0.76"
 quote = "1.0.35"
 syn = { version = "2.0.48", features = ["full"] }
+syn-path = "2.0.0"
 
 [lib]
 proc-macro = true

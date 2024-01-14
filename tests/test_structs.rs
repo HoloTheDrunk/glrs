@@ -40,3 +40,5 @@ fn basic_struct() {
     assert_is_type!(Fields, arr: [f32; 3]);
     assert_is_type!(Fields, arr_arr: [[f32; 3]; 2]);
 }
+
+// TODO: use try-build to check error messages

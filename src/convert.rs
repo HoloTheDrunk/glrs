@@ -193,8 +193,12 @@ fn resolve_glsl_const_int_expr(expr: Box<Expr>) -> u32 {
 }
 
 pub fn get_fields(path: String, ident: String) -> Vec<proc_macro2::TokenStream> {
-    let content = std::fs::read_to_string(path.clone()).unwrap();
-    let gl = glsl::syntax::TranslationUnit::parse(content).unwrap();
+    let content = std::fs::read_to_string(path.clone())
+        .map_err(|err| format!("Failed to open file: {err}"))
+        .unwrap();
+    let gl = glsl::syntax::TranslationUnit::parse(content)
+        .map_err(|err| format!("Invalid OpenGL file: {err}"))
+        .unwrap();
 
     let mut finder = StructFinder::new(ident.as_ref());
     gl.visit(&mut finder);

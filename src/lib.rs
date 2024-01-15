@@ -67,13 +67,13 @@ pub fn import(args: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 fn assert_rust_struct_validity(item: &ItemStruct) {
-    if item.generics.params.len() > 0 {
+    if !item.generics.params.is_empty() {
         emit_error!(
             item.span(),
             "GLSL-imported structs must be free of generics"
         );
     }
-    if item.fields.len() > 0 {
+    if !item.fields.is_empty() {
         emit_error!(
             item.span(),
             "GLSL-imported structs must not have any fields"

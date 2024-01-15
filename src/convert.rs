@@ -163,7 +163,7 @@ fn map_glsl_type_arr(
             },
         ));
     }
-    res.expect("Invalid array dimensions mapping").into()
+    res.expect("Invalid array dimensions mapping")
 }
 
 fn resolve_glsl_arr_dim_size(dim: ArraySpecifierDimension) -> usize {
@@ -172,13 +172,13 @@ fn resolve_glsl_arr_dim_size(dim: ArraySpecifierDimension) -> usize {
             abort_call_site!("Unsized arrays are forbidden in structs.")
         }
         ArraySpecifierDimension::ExplicitlySized(expr) => {
-            resolve_glsl_const_int_expr(expr) as usize
+            resolve_glsl_const_int_expr(*expr) as usize
         }
     }
 }
 
-fn resolve_glsl_const_int_expr(expr: Box<Expr>) -> u32 {
-    match *expr {
+fn resolve_glsl_const_int_expr(expr: Expr) -> u32 {
+    match expr {
         Expr::IntConst(v) => {
             if v <= 0 {
                 abort_call_site!("Invalid array dimension: {}", v)
@@ -186,8 +186,8 @@ fn resolve_glsl_const_int_expr(expr: Box<Expr>) -> u32 {
                 v as u32
             }
         }
-        Expr::UIntConst(v) => v as u32,
-        Expr::Unary(UnaryOp::Add, expr) => resolve_glsl_const_int_expr(expr),
+        Expr::UIntConst(v) => v,
+        Expr::Unary(UnaryOp::Add, expr) => resolve_glsl_const_int_expr(*expr),
         _ => unreachable!("Unsupported GLSL const int expr"),
     }
 }

@@ -3,10 +3,13 @@
 struct Camera;
 
 #[glrs::import(path = "examples/structs.glsl", name = "Player")]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct GlPlayer;
 
 fn main() {
     dbg!(Camera::default());
-    dbg!(GlPlayer::default());
+    dbg!(GlPlayer {
+        pos: glam::vec3(0., 0., 0.),
+        speed: glam::vec3(0., 0., 0.)
+    });
 }

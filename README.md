@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/badge/github-holothedrunk/glrs-8da0cb?style=for-the-badge&labelColor=555555&logo=github)](https://github.com/HoloTheDrunk/glrs)
 [![Crates.io](https://img.shields.io/crates/v/glrs?style=for-the-badge&color=fc8d62&logo=rust)](https://crates.io/crates/glrs)
 [![Docs.rs](https://img.shields.io/badge/docs.rs-glrs-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs)](https://docs.rs/glrs)
-![Continuous Integration](https://img.shields.io/github/actions/workflow/status/HoloTheDrunk/glrs/rust.yml?style=for-the-badge&color=fc8d62&logo=rust)
+![Continuous Integration](https://img.shields.io/github/actions/workflow/status/HoloTheDrunk/glrs/rust.yml?style=for-the-badge&logo=rust)
 
 Passing data between Rust and OpenGL is error-prone and mistakes can be hard to debug.
 

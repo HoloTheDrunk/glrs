@@ -18,14 +18,16 @@ use syn::{parse_macro_input, spanned::Spanned, ItemStruct, LitStr};
 pub fn import(args: TokenStream, item: TokenStream) -> TokenStream {
     // Mandatory
     let mut path = None::<LitStr>;
-    // Optionsl override
+    // Optional override
     let mut name = None::<LitStr>;
 
     let args_parser = syn::meta::parser(|meta| {
         if meta.path.is_ident("path") {
-            Ok(path = Some(meta.value()?.parse()?))
+            path = Some(meta.value()?.parse()?);
+            Ok(())
         } else if meta.path.is_ident("name") {
-            Ok(name = Some(meta.value()?.parse()?))
+            name = Some(meta.value()?.parse()?);
+            Ok(())
         } else {
             Err(meta.error("unsupported import property"))
         }

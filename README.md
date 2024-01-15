@@ -44,7 +44,7 @@ struct Player {
 
 `src/main.rs`
 
-```rs
+```rust
 #[glrs::import(path = "shaders/utils.glsl", name = "Player")]
 #[derive(Debug)]
 struct GlPlayer;

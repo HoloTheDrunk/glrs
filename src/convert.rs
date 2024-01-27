@@ -49,7 +49,7 @@ impl ToTokens for Struct {
 }
 
 macro_rules! type_map {
-    ($($glsl:ident => $($lit:ident)::*),* $(,)?) => {
+    ($($glsl:ident),* $(,)?) => {
         /// Get the glam type corresponding to a given glsl type.
         fn map_glsl_type(ty: TypeSpecifierNonArray) -> syn::Path {
             match ty {
@@ -57,7 +57,7 @@ macro_rules! type_map {
                 TypeSpecifierNonArray::UInt => path!(u32),
                 TypeSpecifierNonArray::Float => path!(f32),
                 TypeSpecifierNonArray::Double => path!(f64),
-                $(TypeSpecifierNonArray::$glsl => path!(::glam::$($lit)::*),)*
+                $(TypeSpecifierNonArray::$glsl => path!(::glam::$glsl),)*
                 ty => abort!(Span::call_site(), "Incompatible GLSL type: {:?}", ty),
             }
         }
@@ -67,33 +67,13 @@ macro_rules! type_map {
 // Could probably figure out a more succint way to do this using grouping based on glam type
 // module but this works well enough.
 type_map! {
-    Vec2 => f32::Vec2,
-    Vec3 => f32::Vec3,
-    Vec4 => f32::Vec4,
-
-    Mat2 => f32::Mat2,
-    Mat3 => f32::Mat3,
-    Mat4 => f32::Mat4,
-
-    DVec2 => f64::DVec2,
-    DVec3 => f64::DVec3,
-    DVec4 => f64::DVec4,
-
-    DMat2 => f64::DMat2,
-    DMat3 => f64::DMat3,
-    DMat4 => f64::DMat4,
-
-    BVec2 => bool::BVec2,
-    BVec3 => bool::BVec3,
-    BVec4 => bool::BVec4,
-
-    IVec2 => i32::IVec2,
-    IVec3 => i32::IVec3,
-    IVec4 => i32::IVec4,
-
-    UVec2 => u32::UVec2,
-    UVec3 => u32::UVec3,
-    UVec4 => u32::UVec4,
+    Vec2, Vec3, Vec4,
+    Mat2, Mat3, Mat4,
+    DVec2, DVec3, DVec4,
+    DMat2, DMat3, DMat4,
+    BVec2, BVec3, BVec4,
+    IVec2, IVec3, IVec4,
+    UVec2, UVec3, UVec4,
 }
 
 // TODO: split into submodule
